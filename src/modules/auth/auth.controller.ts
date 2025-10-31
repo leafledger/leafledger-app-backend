@@ -62,7 +62,16 @@ export const login = async (req: Request, res: Response) => {
     // Step 3 - Call Service for Login Logic
     const result = await loginService(dto.email, dto.password);
 
-    // Step 4 - Send response
+    // Step 4 - Store JWT in HTTP-only cookie
+    const token = result.token;
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // Will change to true on production (HTTPS)
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    // Step 5 - Send response
     res.status(200).json(result);
   } catch (error: any) {
     console.error("Login error:", error);
