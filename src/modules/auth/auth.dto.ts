@@ -13,3 +13,14 @@ export class SignupDto {
   @IsPhoneNumber("IN", { message: "Invalid phone number" })
   contact_no: string;
 }
+
+
+export class LoginDto {
+  // Step 1 - Validate Email
+  @IsEmail({}, { message: "Invalid email format. Please check your entered mail!!" })
+  email: string;
+
+  // Step 1 - Validate Password length
+  @Length(6, 20, { message: "Password must be 6–20 characters" })
+  password: string;
+}

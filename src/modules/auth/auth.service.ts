@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 
+ import jwt, { Secret, SignOptions } from "jsonwebtoken";
+
 const prisma = new PrismaClient();
 
 export const signupService = async (data: any) => {
@@ -38,6 +40,43 @@ export const signupService = async (data: any) => {
             password: hashedPassword,
         },
     });
+    
+    const JWT_SECRET: Secret = process.env.JWT_SECRET || "fallback_secret";
+    
+    const token = jwt.sign(
+        { id: newUser.id, email: newUser.email },
+        JWT_SECRET,
+        { expiresIn: process.env.EXPIRES_IN || "7d" } as SignOptions // ✅ typecast fixes overload
+    );
 
-    return newUser;
+    return [token, newUser];
 }
+
+export const loginService = async (email: string, password: string) => {
+  // Step 2-I - Find user by email
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) throw new Error("Invalid credentials");
+
+  // Step 2-II - Compare password
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) throw new Error("Invalid credentials");
+
+  const JWT_SECRET: Secret = process.env.JWT_SECRET || "fallback_secret";
+  // Step 2-III - Generate JWT token
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    JWT_SECRET,
+    { expiresIn: process.env.EXPIRES_IN || "7d" } as SignOptions // ✅ typecast fixes overload
+  );
+
+  // Step 2-IV - Return user + token
+  return {
+    message: "Login successful",
+    user: {
+      id: user.id,
+      email: user.email,
+      user_name: user.user_name,
+    },
+    token,
+  };
+};
