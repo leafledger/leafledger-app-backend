@@ -72,3 +72,38 @@ export async function signupService(data: any) {
 
   return { token, user: newUser };
 }
+
+export async function loginService(email: string, password: string) {
+  // Find user by email
+  const user = await prisma.user.findUnique({
+    where: { email: email.trim().toLowerCase() },
+  });
+
+  if (!user) {
+    throw new Error("Invalid credentials");
+  }
+
+  // Verify password
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw new Error("Invalid credentials");
+  }
+
+  // Generate JWT token
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    config.jwt.secret as Secret,
+    { expiresIn: config.jwt.expiresIn } as jwt.SignOptions
+  );
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      user_name: user.user_name,
+      email: user.email,
+      contact_no: user.contact_no,
+    },
+    message: "Login successful",
+  };
+}

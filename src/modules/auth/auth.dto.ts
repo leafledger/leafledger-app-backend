@@ -47,3 +47,11 @@ export class SignupDto {
   @IsString()
   address?: string;
 }
+
+export class LoginDto {
+  @IsEmail({}, { message: "Invalid email format. Please check your entered mail!!" })
+  email: string;
+
+  @Length(6, 128, { message: "Password must be at least 6 characters" })
+  password: string;
+}
