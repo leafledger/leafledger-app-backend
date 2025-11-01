@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 
-import { SignupDto } from "./auth.dto";
+import { SignupDto, LoginDto } from "./auth.dto";
 import { validate } from "class-validator";
-import { signupService } from "./auth.service";
+import { signupService, loginService } from "./auth.service";
 import { validationErrorHandler } from "../../middleware/errorHandler";
 import {
   successResponse,
@@ -45,5 +45,36 @@ export async function signup(req: Request, res: Response) {
     );
   } catch (error: any) {
     res.status(400).json(errorResponse(error.message || "Server error"));
+  }
+}
+
+export async function login(req: Request, res: Response) {
+  try {
+    // Validate request body
+    const dto = new LoginDto();
+    dto.email = req.body.email;
+    dto.password = req.body.password;
+
+    const errors = await validate(dto);
+
+    // Check if validation errors exist
+    if (errors.length > 0) {
+      return validationErrorHandler(errors, res);
+    }
+
+    // Call service for login logic
+    const result = await loginService(dto.email, dto.password);
+
+    res.status(200).json(
+      successResponse(
+        {
+          token: result.token,
+          user: result.user,
+        },
+        result.message
+      )
+    );
+  } catch (error: any) {
+    res.status(400).json(errorResponse(error.message || "Login failed"));
   }
 }
