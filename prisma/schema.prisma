@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id          String     @id @default(uuid()) @unique
+  user_name   String     @unique @db.VarChar(50)
+  password    String
+  email       String     @unique @db.VarChar(250)
+  name        String     @db.VarChar(100)
+  contact_no  String     @unique @db.VarChar(13)
+  store       String     @db.VarChar(100)
+  province_id String     @db.Char(3)
+  city        String     @db.VarChar(50)
+  vendor_type VendorType
+  address     String     @db.VarChar(250)
+
+  // Example relationship if province_id links to a Province table
+  province    Province?  @relation(fields: [province_id], references: [id])
+}
+
+model Province {
+  id    String @id @db.Char(3)
+  name  String @db.VarChar(100)
+  users User[]
+}
+
+enum VendorType {
+  retailer
+  LP
+  broker
+  agency
+}
+
+model Organisation {
+  id              String   @id @default(uuid()) // UUID primary key
+  organisation_name   String
+  organisation_address String?
+  plan_id             Int?     // relation to Plans
+  plan                Plan?    @relation(fields: [plan_id], references: [id])
+}
+
+model Plan {
+  id        Int      @id @default(autoincrement())
+  price     Float
+  features  Json     // JSON field for {history_days, refresh, logins_number}
+}
+
+model Session {
+  id     String   @id @default(uuid())
+  auth_token     String
+  refresh_token  String
+  user_id        Int
+  user           User     @relation(fields: [user_id], references: [id])
+  createdAt      DateTime @default(now())
+}
