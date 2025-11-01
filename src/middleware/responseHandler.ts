@@ -1,3 +1,5 @@
+import { Response } from "express";
+
 export interface ApiResponse<T = any> {
   success: boolean;
   message: string;
@@ -7,69 +9,80 @@ export interface ApiResponse<T = any> {
 }
 
 export function successResponse<T = any>(
+  res: Response,
   data?: T,
-  message: string = "Request successful"
-): ApiResponse<T> {
-  return {
+  message: string = "Request successful",
+  statusCode: number = 200
+) {
+  return res.status(statusCode).json({
     success: true,
     message,
     data,
-  };
+  });
 }
 
 export function errorResponse(
+  res: Response,
   message: string = "Request failed",
-  errors?: { field: string; message: string }[]
-): ApiResponse {
-  return {
+  errors?: { field: string; message: string }[],
+  statusCode: number = 400
+) {
+  return res.status(statusCode).json({
     success: false,
     message,
     errors,
-  };
+  });
 }
 
 export function serverErrorResponse(
+  res: Response,
   message: string = "Internal server error"
-): ApiResponse {
-  return {
+) {
+  return res.status(500).json({
     success: false,
     message,
     error: message,
-  };
+  });
 }
 
 export function createdResponse<T = any>(
+  res: Response,
   data?: T,
   message: string = "Resource created successfully"
-): ApiResponse<T> {
-  return {
+) {
+  return res.status(201).json({
     success: true,
     message,
     data,
-  };
+  });
 }
 
 export function notFoundResponse(
+  res: Response,
   message: string = "Resource not found"
-): ApiResponse {
-  return {
+) {
+  return res.status(404).json({
     success: false,
     message,
-  };
+  });
 }
 
 export function unauthorizedResponse(
+  res: Response,
   message: string = "Unauthorized"
-): ApiResponse {
-  return {
+) {
+  return res.status(401).json({
     success: false,
     message,
-  };
+  });
 }
 
-export function forbiddenResponse(message: string = "Forbidden"): ApiResponse {
-  return {
+export function forbiddenResponse(
+  res: Response,
+  message: string = "Forbidden"
+) {
+  return res.status(403).json({
     success: false,
     message,
-  };
+  });
 }

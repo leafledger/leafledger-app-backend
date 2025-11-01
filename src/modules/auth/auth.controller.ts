@@ -5,6 +5,7 @@ import { validate } from "class-validator";
 import { signupService, loginService } from "./auth.service";
 import { validationErrorHandler } from "../../middleware/errorHandler";
 import {
+  createdResponse,
   successResponse,
   errorResponse,
 } from "../../middleware/responseHandler";
@@ -29,22 +30,21 @@ export async function signup(req: Request, res: Response) {
     const result = await signupService(req.body);
 
     //TODO : Need to make a constants for all messages
-    res.status(201).json(
-      successResponse(
-        {
-          token: result.token,
-          user: {
-            id: result.user.id,
-            user_name: result.user.user_name,
-            email: result.user.email,
-            contact_no: result.user.contact_no,
-          },
+    return createdResponse(
+      res,
+      {
+        token: result.token,
+        user: {
+          id: result.user.id,
+          user_name: result.user.user_name,
+          email: result.user.email,
+          contact_no: result.user.contact_no,
         },
-        "Signup successful"
-      )
+      },
+      "Signup successful"
     );
   } catch (error: any) {
-    res.status(400).json(errorResponse(error.message || "Server error"));
+    return errorResponse(res, error.message || "Server error");
   }
 }
 
@@ -65,16 +65,15 @@ export async function login(req: Request, res: Response) {
     // Call service for login logic
     const result = await loginService(dto.email, dto.password);
 
-    res.status(200).json(
-      successResponse(
-        {
-          token: result.token,
-          user: result.user,
-        },
-        result.message
-      )
+    return successResponse(
+      res,
+      {
+        token: result.token,
+        user: result.user,
+      },
+      result.message
     );
   } catch (error: any) {
-    res.status(400).json(errorResponse(error.message || "Login failed"));
+    return errorResponse(res, error.message || "Login failed");
   }
 }
