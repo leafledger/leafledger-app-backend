@@ -1,15 +1,16 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 
 import { SignupDto } from "./auth.dto";
 import { validate } from "class-validator";
 import { signupService } from "./auth.service";
+import { validationErrorHandler } from "../../middleware/errorHandler";
+import {
+  successResponse,
+  errorResponse,
+} from "../../middleware/responseHandler";
 
-const prisma = new PrismaClient();
-
-export const signup = async (req: Request, res: Response) => {
+export async function signup(req: Request, res: Response) {
   try {
-
     // Step: 1 -> I - validate request body
     const dto = new SignupDto();
     dto.user_name = req.body.user_name;
@@ -21,18 +22,28 @@ export const signup = async (req: Request, res: Response) => {
 
     // Step: 1 -> II - check error exists then structured error fields and update user
     if (errors.length > 0) {
-      const formattedErrors = errors.map(e=>({field: e.property, message: Object.values(e.constraints)[0]}));
-      return res.status(400).json({
-        message: "Validation failed",
-        errors: formattedErrors
-      });
+      return validationErrorHandler(errors, res);
     }
 
     // Step: 2: Business logic(service)
-    const newUser = await signupService(req.body);
+    const result = await signupService(req.body);
 
-    res.status(201).json({ message: "Signup successful", user: newUser });
-  } catch (error) {
-    return res.status(400).json({ message: error.message || "Server error" });
+    //TODO : Need to make a constants for all messages
+    res.status(201).json(
+      successResponse(
+        {
+          token: result.token,
+          user: {
+            id: result.user.id,
+            user_name: result.user.user_name,
+            email: result.user.email,
+            contact_no: result.user.contact_no,
+          },
+        },
+        "Signup successful"
+      )
+    );
+  } catch (error: any) {
+    res.status(400).json(errorResponse(error.message || "Server error"));
   }
-};
+}
