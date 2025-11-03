@@ -26,7 +26,7 @@ app.use(
 );
 
 // API calling request
-app.use("/api/auth", authRoutes);
+app.use("/api", authRoutes);
 
 // Global error handler - should be the last middleware
 app.use(errorHandler);
