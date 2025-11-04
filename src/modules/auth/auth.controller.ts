@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 import { SignupDto, LoginDto } from "./auth.dto";
 import { validate } from "class-validator";
@@ -9,6 +9,9 @@ import {
   successResponse,
   errorResponse,
 } from "../../middleware/responseHandler";
+
+import prisma from "../../config/db";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 export async function signup(req: Request, res: Response) {
   try {
@@ -33,7 +36,6 @@ export async function signup(req: Request, res: Response) {
     return createdResponse(
       res,
       {
-        token: result.token,
         user: {
           id: result.user.id,
           user_name: result.user.user_name,
@@ -68,7 +70,8 @@ export async function login(req: Request, res: Response) {
     return successResponse(
       res,
       {
-        token: result.token,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
         user: result.user,
       },
       result.message
@@ -76,4 +79,48 @@ export async function login(req: Request, res: Response) {
   } catch (error: any) {
     return errorResponse(res, error.message || "Login failed");
   }
+}
+
+export async function protect (req: Request, res: Response, next: NextFunction) {
+    // 1) Getting token and check if it is there or not
+    let token;
+    if(req.headers.authorization?.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    } 
+    console.log('token from protect', token)
+    // 2) check wheather token is there or not, if not then user is not logged in
+    if (!token) console.log('You are not logged in!! Please login to get the access!!');
+    // 3) verification of the token
+    // const decoded = (await promisify(jwt.verify)(token, process.env.ACCESS_TOKEN_SECRET as string)) as JwtPayload;
+    
+    const verifyAsync = (token: string, secret: string): Promise<JwtPayload> => {
+      return new Promise((resolve, reject) => {
+        jwt.verify(token, secret, (err, decoded) => {
+          if (err || !decoded) return reject(err);
+          resolve(decoded as JwtPayload);
+        });
+      });
+    };
+
+    // usage
+    const decoded = await verifyAsync(token || '', process.env.ACCESS_TOKEN_SECRET as string);
+
+    
+    
+    
+    
+    // // 4) check the user is there or not in the Database
+    const existingUser = await prisma.user.findFirst({
+      where: { OR: [{ email: decoded.email }, { id: decoded.id }] },
+    });
+    console.log('existingUser value', existingUser)
+    // // Grant access on the basis of logged in user
+    req["user"] = existingUser;
+    next();
+};
+
+export async function catalog (req: Request, res: Response) {
+  res.json({
+        message: `welcome ${req.user?.user_name} to the catalog`
+    })
 }

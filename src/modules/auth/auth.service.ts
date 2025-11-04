@@ -4,6 +4,7 @@ import prisma from "../../config/db";
 import { config } from "../../config/config";
 import { validatePasswordComplexity } from "../../utils/password.util";
 import { sanitizeUserInput } from "../../utils/inputSanitizer";
+import { generateTokens } from "../../utils/jwt.util";
 
 export async function signupService(data: any) {
   // Sanitize input data first
@@ -63,14 +64,7 @@ export async function signupService(data: any) {
     },
   });
 
-  // Step: 4 - Generate JWT token
-  const token = jwt.sign(
-    { id: newUser.id, email: newUser.email },
-    config.jwt.secret as Secret,
-    { expiresIn: config.jwt.expiresIn } as jwt.SignOptions
-  );
-
-  return { token, user: newUser };
+  return { user: newUser };
 }
 
 export async function loginService(email: string, password: string) {
@@ -89,15 +83,12 @@ export async function loginService(email: string, password: string) {
     throw new Error("Invalid credentials");
   }
 
-  // Generate JWT token
-  const token = jwt.sign(
-    { id: user.id, email: user.email },
-    config.jwt.secret as Secret,
-    { expiresIn: config.jwt.expiresIn } as jwt.SignOptions
-  );
+  // Step: 4 - Generate JWT token
+  const { accessToken, refreshToken } = generateTokens(user);
 
   return {
-    token,
+    accessToken,
+    refreshToken,
     user: {
       id: user.id,
       user_name: user.user_name,
