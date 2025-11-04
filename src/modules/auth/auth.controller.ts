@@ -101,11 +101,10 @@ export async function protect (req: Request, res: Response, next: NextFunction) 
         });
       });
     };
-    console.log('verifyAsync', verifyAsync.name)
 
     // usage
-    const decoded = await verifyAsync(token || '', process.env.ACCESS_TOKEN_SECRET as string);    
-    
+    const decoded = await verifyAsync(token || '', process.env.ACCESS_TOKEN_SECRET as string);
+   
     // // 4) check the user is there or not in the Database
     const existingUser = await prisma.user.findFirst({
       where: { OR: [{ email: decoded.email }, { id: decoded.id }] },
