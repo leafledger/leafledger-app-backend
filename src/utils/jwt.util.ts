@@ -12,19 +12,17 @@ interface UserPayload {
   id: string;
 }
 
-// Function to generate tokens
 export const generateTokens = (user: UserPayload) => {
-  
+
   const accessToken = jwt.sign(
     { id: user.id, email: user.email },
     ACCESS_TOKEN_SECRET,
-    { expiresIn: ACCESS_EXPIRES_IN } as jwt.SignOptions // short lifespan
+    { expiresIn: ACCESS_EXPIRES_IN } as jwt.SignOptions
   );
-
   const refreshToken = jwt.sign(
-    { id: user.id },
+    { id: user.id, email: user.email },
     REFRESH_TOKEN_SECRET,
-    { expiresIn: REFRESH_EXPIRES_IN } as jwt.SignOptions // longer lifespan
+    { expiresIn: REFRESH_EXPIRES_IN } as jwt.SignOptions
   );
   return { accessToken, refreshToken };
 };

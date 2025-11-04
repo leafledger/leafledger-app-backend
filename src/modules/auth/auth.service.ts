@@ -94,6 +94,7 @@ export async function loginService(email: string, password: string) {
       user_name: user.user_name,
       email: user.email,
       contact_no: user.contact_no,
+      name: user.name,
     },
     message: "Login successful",
   };

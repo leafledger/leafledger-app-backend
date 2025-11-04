@@ -1,5 +1,6 @@
 import authRoutes from "./src/modules/auth/auth.routes";
 import { errorHandler } from "./src/middleware/errorHandler";
+import refreshRouter from "./src/modules/refresh/refresh.router";
 
 import cors from "cors";
 import express from "express";
@@ -25,11 +26,15 @@ app.use(
   })
 );
 
+
 // API calling request
 app.use("/api", authRoutes);
 
 // Global error handler - should be the last middleware
 app.use(errorHandler);
+
+
+app.use("/refresh", refreshRouter);
 
 const port = config.server.port;
 app.listen(port, () => {
