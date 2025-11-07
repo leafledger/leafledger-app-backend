@@ -6,6 +6,7 @@ import cors from "cors";
 import express from "express";
 import { config } from "./src/config/config";
 import dotenv from "dotenv";
+import logoutRouter from "./src/modules/logout/logout.routes";
 
 // Load environment variables
 dotenv.config();
@@ -35,6 +36,8 @@ app.use(errorHandler);
 
 
 app.use("/refresh", refreshRouter);
+
+app.use("/logout", logoutRouter);
 
 const port = config.server.port;
 app.listen(port, () => {
