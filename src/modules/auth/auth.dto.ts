@@ -5,10 +5,14 @@ import {
   IsOptional,
   IsString,
   IsIn,
+  Matches,
 } from "class-validator";
 
 export class SignupDto {
-  @Length(3, 20, { message: "user_name must be 3-20 characters" })
+  @Length(3, 50, { message: "user_name must be 3-50 characters" })
+  @Matches(/^[A-Za-z0-9._]+$/, {
+    message: "user_name can only contain letters, numbers, dot, and underscore (no spaces or special characters)",
+  })
   user_name: string;
 
   @IsEmail({}, { message: "Invalid email" })
