@@ -13,28 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id          String     @id @default(uuid()) @unique
-  user_name   String     @unique @db.VarChar(50)
-  password    String
-  email       String     @unique @db.VarChar(250)
-  name        String     @db.VarChar(100)
-  contact_no  String     @unique @db.VarChar(13)
-  store       String     @db.VarChar(100)
-  province_id String     @db.Char(3)
-  city        String     @db.VarChar(50)
-  vendor_type VendorType
-  address     String     @db.VarChar(250)
+  id              String        @id @unique @default(uuid())
+  user_name       String        @unique @db.VarChar(50)
+  password        String
+  email           String        @unique @db.VarChar(250)
+  name            String        @db.VarChar(100)
+  contact_no      String        @unique @db.VarChar(13)
+  store           String        @db.VarChar(100)
+  province_id     String        @db.Char(3)
+  city            String        @db.VarChar(50)
+  vendor_type     VendorType
+  address         String        @db.VarChar(250)
+  sessions        Session[] 
+  organisation    Organisation? @relation(fields: [organisation_id], references: [id])
+  organisation_id String? 
+  province        Province?     @relation(fields: [province_id], references: [id])
 
-  // Example relationship if province_id links to a Province table
-  province    Province?  @relation(fields: [province_id], references: [id])
+  @@map("users")
 }
 
 model Province {
   id    String @id @db.Char(3)
   name  String @db.VarChar(100)
   users User[]
+
+  @@map("provinces")
 }
 
 enum VendorType {
@@ -45,24 +49,32 @@ enum VendorType {
 }
 
 model Organisation {
-  id              String   @id @default(uuid()) // UUID primary key
-  organisation_name   String
+  id                   String  @id @default(uuid()) // UUID primary key
+  organisation_name    String
   organisation_address String?
-  plan_id             Int?     // relation to Plans
-  plan                Plan?    @relation(fields: [plan_id], references: [id])
+  plan_id              Int? // relation to Plans
+  users                User[] // One-to-many relationship with users
+  plan                 Plan?   @relation(fields: [plan_id], references: [id])
+
+  @@map("organisations")
 }
 
 model Plan {
-  id        Int      @id @default(autoincrement())
-  price     Float
-  features  Json     // JSON field for {history_days, refresh, logins_number}
+  id       Int            @id @default(autoincrement())
+  price    Float
+  features Json // JSON field for {history_days, refresh, logins_number}
+  users    Organisation[]
+
+  @@map("plans")
 }
 
 model Session {
-  id     String   @id @default(uuid())
-  auth_token     String
-  refresh_token  String
-  user_id        Int
-  user           User     @relation(fields: [user_id], references: [id])
-  createdAt      DateTime @default(now())
+  id            String   @id @default(uuid())
+  auth_token    String
+  refresh_token String
+  user_id       String 
+  user          User     @relation(fields: [user_id], references: [id])
+  createdAt     DateTime @default(now())
+
+  @@map("sessions")
 }
