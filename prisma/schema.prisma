@@ -26,15 +26,21 @@ model User {
   city        String     @db.VarChar(50)
   vendor_type VendorType
   address     String     @db.VarChar(250)
+  organisation_id String? @db.VarChar(36) // Optional foreign key to organisations
 
-  // Example relationship if province_id links to a Province table
-  province    Province?  @relation(fields: [province_id], references: [id])
+  province    Province?  @relation(fields: [province_id], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  sessions    Session[]
+  organisation Organisation? @relation(fields: [organisation_id], references: [id])
+  
+  @@map("users")
 }
 
 model Province {
   id    String @id @db.Char(3)
   name  String @db.VarChar(100)
   users User[]
+  
+  @@map("provinces")
 }
 
 enum VendorType {
@@ -50,19 +56,27 @@ model Organisation {
   organisation_address String?
   plan_id             Int?     // relation to Plans
   plan                Plan?    @relation(fields: [plan_id], references: [id])
+  users               User[]
+  
+  @@map("organisations")
 }
 
 model Plan {
   id        Int      @id @default(autoincrement())
   price     Float
   features  Json     // JSON field for {history_days, refresh, logins_number}
+  organisations Organisation[]
+  
+  @@map("plans")
 }
 
 model Session {
   id     String   @id @default(uuid())
   auth_token     String
   refresh_token  String
-  user_id        Int
-  user           User     @relation(fields: [user_id], references: [id])
+  user_id        String     @db.VarChar(36) // UUID length
+  user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
+  
+  @@map("sessions")
 }
