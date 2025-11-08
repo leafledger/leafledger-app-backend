@@ -1,6 +1,8 @@
 import authRoutes from "./src/modules/auth/auth.routes";
 import { errorHandler } from "./src/middleware/errorHandler";
 import refreshRouter from "./src/modules/refresh/refresh.router";
+import swaggerSpec from "./src/config/swagger.config";
+import swaggerUi from "swagger-ui-express";
 
 import cors from "cors";
 import express from "express";
@@ -26,6 +28,17 @@ app.use(
   })
 );
 
+// Swagger Documentation Routes
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "LeafLedger API Documentation",
+}));
+
+// Swagger JSON endpoint
+app.get("/api-docs.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
 
 // API calling request
 app.use("/api", authRoutes);
