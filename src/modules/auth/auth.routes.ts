@@ -8,6 +8,6 @@ router.post("/auth/signup", signup);
 router.post("/auth/login", login);
 
 // API for product
-router.route("/catalog").get(protect, catalog)
+router.route("/catalog").get(protect, catalog);
 
 export default router;
