@@ -7,6 +7,8 @@ import express from "express";
 import { config } from "./src/config/config";
 import dotenv from "dotenv";
 import logoutRouter from "./src/modules/logout/logout.routes";
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './src/config/swagger.config';
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +32,13 @@ app.use(
 
 // API calling request
 app.use("/api", authRoutes);
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // Global error handler - should be the last middleware
 app.use(errorHandler);
