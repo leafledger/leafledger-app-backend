@@ -7,8 +7,14 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.ts",
     "dev": "nodemon --exec ts-node server.ts",
+    "dev:local": "cp .env.local .env && nodemon --exec ts-node server.ts",
+    "dev:prod": "cp .env.production .env && nodemon --exec ts-node server.ts",
     "build": "tsc",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts",
+    "seed:local": "cp .env.local .env && ts-node prisma/seed.ts",
+    "seed:prod": "cp .env.production .env && ts-node prisma/seed.ts",
+    "prisma:studio": "npx prisma studio",
+    "prisma:migrate": "npx prisma migrate dev"
   },
   "repository": {
     "type": "git",

@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import logoutRouter from "./src/modules/logout/logout.routes";
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/config/swagger.config';
+import { connectDatabase } from "./src/config/db";
 
 // Load environment variables
 dotenv.config();
@@ -49,6 +50,22 @@ app.use("/refresh", refreshRouter);
 app.use("/logout", logoutRouter);
 
 const port = config.server.port;
-app.listen(port, () => {
-  console.log(`App is running on port ${port}`);
-});
+
+// Start server with database connection
+async function startServer() {
+  try {
+    // Connect to database first
+    await connectDatabase();
+
+    // Then start the server
+    app.listen(port, () => {
+      console.log(`[SERVER] Running on port ${port}`);
+      console.log(`[SERVER] API Documentation available at http://localhost:${port}/api-docs`);
+    });
+  } catch (error) {
+    console.error('[SERVER] Failed to start:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
