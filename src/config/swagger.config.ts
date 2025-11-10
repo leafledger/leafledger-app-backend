@@ -39,6 +39,25 @@ const swaggerOptions: swaggerJsdoc.Options = {
         },
       },
       schemas: {
+        // Province Schema
+        Province: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              maxLength: 2,
+              description: "Province/Territory code",
+              enum: ["AB", "BC", "MB", "NB", "NL", "NS", "ON", "PE", "QC", "SK", "NT", "NU", "YT"],
+              example: "ON",
+            },
+            name: {
+              type: "string",
+              description: "Full province/territory name",
+              example: "Ontario",
+            },
+          },
+        },
+
         // User Schema
         User: {
           type: "object",
@@ -77,7 +96,8 @@ const swaggerOptions: swaggerJsdoc.Options = {
             province_id: {
               type: "string",
               maxLength: 3,
-              description: "Province identifier",
+              description: "Province/Territory code (AB, BC, MB, NB, NL, NS, ON, PE, QC, SK, NT, NU, YT)",
+              enum: ["AB", "BC", "MB", "NB", "NL", "NS", "ON", "PE", "QC", "SK", "NT", "NU", "YT"],
             },
             city: {
               type: "string",
@@ -139,7 +159,8 @@ const swaggerOptions: swaggerJsdoc.Options = {
             province_id: {
               type: "string",
               example: "ON",
-              description: "Province code",
+              description: "Canadian Province/Territory code",
+              enum: ["AB", "BC", "MB", "NB", "NL", "NS", "ON", "PE", "QC", "SK", "NT", "NU", "YT"],
             },
             city: {
               type: "string",
