@@ -1,7 +1,9 @@
 import authRoutes from "./src/modules/auth/auth.routes";
 import { errorHandler } from "./src/middleware/errorHandler";
 import refreshRouter from "./src/modules/refresh/refresh.router";
+import { expressMiddleware } from "@apollo/server/express4";
 
+import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 import { config } from "./src/config/config";
@@ -10,6 +12,7 @@ import logoutRouter from "./src/modules/logout/logout.routes";
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/config/swagger.config';
 import { connectDatabase } from "./src/config/db";
+import { server } from "./src/modules/listing/listing.service";
 
 // Load environment variables
 dotenv.config();
@@ -17,7 +20,9 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(express.json());
+// app.use(express.json());
+app.use(bodyParser.json());
+app.use(cors());
 
 //Enable CORS for all requests
 app.use(
@@ -56,6 +61,11 @@ async function startServer() {
   try {
     // Connect to database first
     await connectDatabase();
+
+    // starting apollo server
+    await server.start();
+    app.use("/graphql", bodyParser.json(), expressMiddleware(server) as any);
+    console.log(`[GRAPHQL] Running on http://localhost:${port}/graphql`);
 
     // Then start the server
     app.listen(port, () => {
