@@ -1,10 +1,8 @@
-// GraphQL modules
-import { listingTypeDefs } from "./listing.typeDefs";
-import { listingResolvers } from "./listing.resolvers";
-import { ApolloServer } from "@apollo/server";
+import prisma from "../../config/db";
+import { CreateListingInput } from "./listing.types";
 
-// ✅ Setup Apollo Server (as middleware)
-export const server = new ApolloServer({
-  typeDefs: [listingTypeDefs],
-  resolvers: [listingResolvers],
-});
+// creating new list and return immediate
+export async function createListing(data: CreateListingInput) {
+  const listing = await prisma.listing.create({ data });
+  return listing; // new list created and retured
+}

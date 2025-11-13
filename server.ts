@@ -12,7 +12,7 @@ import logoutRouter from "./src/modules/logout/logout.routes";
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/config/swagger.config';
 import { connectDatabase } from "./src/config/db";
-import { server } from "./src/modules/listing/listing.service";
+import { server } from "./src/modules/listing/listing.server";
 
 // Load environment variables
 dotenv.config();

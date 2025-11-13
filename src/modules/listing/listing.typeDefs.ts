@@ -23,14 +23,17 @@ export const listingTypeDefs = gql`
     listing(id: ID!): Listing
   }
 
+  # Use input type in mutation
   type Mutation {
-    createListing(
+    createListing(input: ListingInput!): Listing!
+  }
+
+  input ListingInput {
       source_id: String!
       origin: String!
       source: String!
       variant_id: String!
       payload: JSON
       url: String!
-    ): Listing!
   }
 `;

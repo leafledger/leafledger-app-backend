@@ -1,6 +1,5 @@
-// import { PrismaClient } from "@prisma/client";
-// const prisma = new PrismaClient();
 import prisma from "../../config/db";
+import { createListing as createListingService } from "./listing.service";
 
 export const listingResolvers = {
   Query: {
@@ -9,7 +8,9 @@ export const listingResolvers = {
       prisma.listing.findUnique({ where: { id } }),
   },
   Mutation: {
-    createListing: (_: any, args: any) =>
-      prisma.listing.create({ data: args }),
+    createListing: async (_: any, args: any) =>{
+      const listing = await createListingService(args.input);
+      return listing;
+    }
   },
 };
