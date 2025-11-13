@@ -51,6 +51,22 @@ enum VendorType {
   agency
 }
 
+model Listing {
+  id              String   @id @default(uuid())
+  source_id       String   @unique
+  origin          String?
+  source          String?
+  variant_id      String?
+  payload         Json
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  checker_at      DateTime?
+  menu_checked_at DateTime?
+  removed_at      DateTime?
+  url             String   @unique
+  @@index([source_id])
+}
+
 model Organisation {
   id              String   @id @default(uuid()) // UUID primary key
   organisation_name   String
