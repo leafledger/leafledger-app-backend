@@ -8,9 +8,11 @@ import {
   createdResponse,
   successResponse,
   errorResponse,
+  unauthorizedResponse,
 } from "../../middleware/responseHandler";
 
 import prisma from "../../config/db";
+import { config } from "../../config/config";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 export async function signup(req: Request, res: Response) {
@@ -89,30 +91,41 @@ export async function protect (req: Request, res: Response, next: NextFunction) 
     } 
 
     // 2) check wheather token is there or not, if not then user is not logged in
-    if (!token) console.log('You are not logged in!! Please login to get the access!!');
-    // 3) verification of the token
-    // const decoded = (await promisify(jwt.verify)(token, process.env.ACCESS_TOKEN_SECRET as string)) as JwtPayload;
-    
-    const verifyAsync = (token: string, secret: string): Promise<JwtPayload> => {
-      return new Promise((resolve, reject) => {
-        jwt.verify(token, secret, (err, decoded) => {
-          if (err || !decoded) return reject(err);
-          resolve(decoded as JwtPayload);
+    if (!token) {
+        return unauthorizedResponse(res, "You are not logged in!! Please login to get the access!!");
+    }
+
+    try {
+        // 3) verification of the token
+        const secret = process.env.ACCESS_TOKEN_SECRET || config.jwt.secret;
+        
+        const verifyAsync = (token: string, secret: string): Promise<JwtPayload> => {
+          return new Promise((resolve, reject) => {
+            jwt.verify(token, secret, (err, decoded) => {
+              if (err || !decoded) return reject(err);
+              resolve(decoded as JwtPayload);
+            });
+          });
+        };
+
+        // usage
+        const decoded = await verifyAsync(token, secret);
+       
+        // // 4) check the user is there or not in the Database
+        const existingUser = await prisma.user.findFirst({
+          where: { OR: [{ email: decoded.email }, { id: decoded.id }] },
         });
-      });
-    };
 
-    // usage
-    const decoded = await verifyAsync(token || '', process.env.ACCESS_TOKEN_SECRET as string);
-   
-    // // 4) check the user is there or not in the Database
-    const existingUser = await prisma.user.findFirst({
-      where: { OR: [{ email: decoded.email }, { id: decoded.id }] },
-    });
+        if (!existingUser) {
+            return unauthorizedResponse(res, "The user belonging to this token no longer exists.");
+        }
 
-    // Grant access on the basis of logged in user
-    req["user"] = existingUser;
-    next();
+        // Grant access on the basis of logged in user
+        req["user"] = existingUser;
+        next();
+    } catch (error) {
+        return unauthorizedResponse(res, "Invalid token or token expired");
+    }
 };
 
 export async function catalog (req: Request, res: Response) {
