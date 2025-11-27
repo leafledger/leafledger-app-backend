@@ -1,28 +1,28 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import { validate } from "class-validator";
+import { LogoutDto } from "./logout.dto";
+import { logoutService } from "./logout.service";
+import { validationErrorHandler } from "../../middleware/errorHandler";
+import { successResponse, errorResponse } from "../../middleware/responseHandler";
 
-// Example: store invalid tokens in-memory (use Redis in production)
-export const blacklistedTokens: string[] = [];
-
-export const logout = async (req: Request, res: Response) => {
+export async function logout(req: Request, res: Response) {
   try {
-    const { refreshToken } = req.body;
+    // Validate request body
+    const dto = new LogoutDto();
+    dto.refreshToken = req.body.refreshToken;
 
-    if (!refreshToken) {
-      return res.status(400).json({ message: "Refresh token required" });
+    const errors = await validate(dto);
+
+    // Check if validation errors exist
+    if (errors.length > 0) {
+      return validationErrorHandler(errors, res);
     }
 
-    // Verify refresh token before blacklisting
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string, (err: any) => {
-      if (err) {
-        return res.status(403).json({ message: "Invalid refresh token" });
-      }
+    // Call service for logout logic
+    const result = await logoutService(dto.refreshToken);
 
-      // Add to blacklist so that in future if somebody steal the current token then refresh api can not grant the hacker
-      blacklistedTokens.push(refreshToken);
-      return res.status(200).json({ message: "Logged out successfully" });
-    });
-  } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
+    return successResponse(res, {}, result.message);
+  } catch (error: any) {
+    return errorResponse(res, error.message || "Logout failed");
   }
-};
+}

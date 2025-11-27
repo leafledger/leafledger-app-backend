@@ -13,7 +13,7 @@ import {
 
 import prisma from "../../config/db";
 import { config } from "../../config/config";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { verifyToken } from "../../utils/jwt.util";
 
 export async function signup(req: Request, res: Response) {
   try {
@@ -96,20 +96,8 @@ export async function protect (req: Request, res: Response, next: NextFunction) 
     }
 
     try {
-        // 3) verification of the token
-        const secret = process.env.ACCESS_TOKEN_SECRET || config.jwt.secret;
-        
-        const verifyAsync = (token: string, secret: string): Promise<JwtPayload> => {
-          return new Promise((resolve, reject) => {
-            jwt.verify(token, secret, (err, decoded) => {
-              if (err || !decoded) return reject(err);
-              resolve(decoded as JwtPayload);
-            });
-          });
-        };
-
-        // usage
-        const decoded = await verifyAsync(token, secret);
+        // 3) verification of the token using centralized utility
+        const decoded = await verifyToken(token, "access");
        
         // // 4) check the user is there or not in the Database
         const existingUser = await prisma.user.findFirst({
