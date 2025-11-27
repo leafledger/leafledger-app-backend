@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { refreshTokenService } from "./refresh.service";
-import { errorResponse, successResponse } from "../../middleware/responseHandler";
-import { isTokenBlacklisted } from "./../logout/logout.blacklist.helper"; // import the helper
-import jwt from "jsonwebtoken";
+import { errorResponse, successResponse, forbiddenResponse } from "../../middleware/responseHandler";
+import { isTokenBlacklisted } from "./../logout/logout.blacklist.helper";
 
 export async function refreshTokenController(req: Request, res: Response) {
   try {
@@ -11,7 +10,7 @@ export async function refreshTokenController(req: Request, res: Response) {
       return errorResponse(res, "Refresh token is required", undefined, 400);
 
     if (isTokenBlacklisted(refreshToken)) {
-      return res.status(403).json({ message: "Token has been revoked. Please log in again!!" });
+      return forbiddenResponse(res, "Token has been revoked. Please log in again!!");
     }
 
     const result = await refreshTokenService(refreshToken);

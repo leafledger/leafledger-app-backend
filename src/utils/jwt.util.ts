@@ -1,4 +1,4 @@
-import jwt, { Secret } from "jsonwebtoken";
+import jwt, { Secret, JwtPayload } from "jsonwebtoken";
 import { config } from "../config/config";
 
 // Create tokens
@@ -10,8 +10,7 @@ interface UserPayload {
   id: string;
 }
 
-export const generateTokens = (user: UserPayload) => {
-
+export function generateTokens(user: UserPayload) {
   const accessToken = jwt.sign(
     { id: user.id, email: user.email },
     ACCESS_TOKEN_SECRET,
@@ -23,4 +22,24 @@ export const generateTokens = (user: UserPayload) => {
     { expiresIn: config.jwt.refreshExpiresIn } as jwt.SignOptions
   );
   return { accessToken, refreshToken };
-};
+}
+
+/**
+ * Verify a JWT token (access or refresh)
+ * @param token - The token to verify
+ * @param tokenType - Type of token: 'access' or 'refresh'
+ * @returns Promise that resolves to the decoded token payload
+ */
+export function verifyToken(
+  token: string,
+  tokenType: "access" | "refresh" = "access"
+): Promise<JwtPayload> {
+  const secret = tokenType === "access" ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET;
+
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err || !decoded) return reject(err);
+      resolve(decoded as JwtPayload);
+    });
+  });
+}
