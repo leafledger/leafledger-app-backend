@@ -6,7 +6,7 @@ import { successResponse, errorResponse, notFoundResponse } from "../../middlewa
 // For Catalog Listing
 export async function catalog(req: Request, res: Response) {
     try {
-        const { listingData, totalCount } = await CatalogDataHandling(req.query);
+        const { listingData, totalCount, page_no } = await CatalogDataHandling(req);
 
         if (!listingData.length) {
             return notFoundResponse(res, "No Record found!!");
@@ -15,6 +15,7 @@ export async function catalog(req: Request, res: Response) {
         successResponse(res, {
             totalCount,
             currentPageCount: listingData.length,
+            currentPage: page_no,
             listingData,
         }, `welcome ${req.user?.user_name} to the catalog`)
     } catch (error: any) {
