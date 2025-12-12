@@ -1,6 +1,7 @@
 import authRoutes from "./src/modules/auth/auth.routes";
 import { errorHandler } from "./src/middleware/errorHandler";
 import refreshRouter from "./src/modules/refresh/refresh.router";
+import catalogRouter from "./src/modules/catalog/catalog.routes";
 
 import cors from "cors";
 import express from "express";
@@ -32,7 +33,7 @@ app.use(
 
 
 // API calling request
-app.use("/api", authRoutes);
+app.use("/api/auth", authRoutes);
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -48,6 +49,9 @@ app.use(errorHandler);
 app.use("/refresh", refreshRouter);
 
 app.use("/logout", logoutRouter);
+
+// CATALOG
+app.use("/api/catalog", catalogRouter);
 
 const port = config.server.port;
 

@@ -116,8 +116,3 @@ export async function protect (req: Request, res: Response, next: NextFunction) 
     }
 };
 
-export async function catalog (req: Request, res: Response) {
-  res.json({
-        message: `welcome ${req.user?.user_name} to the catalog`
-    })
-}
