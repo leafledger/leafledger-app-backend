@@ -1,18 +1,5 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Province` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "User" DROP CONSTRAINT "User_province_id_fkey";
-
--- DropTable
-DROP TABLE "Province";
-
--- DropTable
-DROP TABLE "User";
+-- CreateEnum
+CREATE TYPE "VendorType" AS ENUM ('retailer', 'LP', 'broker', 'agency');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -70,6 +57,29 @@ CREATE TABLE "sessions" (
     CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ListingAppSide" (
+    "id" UUID NOT NULL,
+    "source_id" TEXT NOT NULL,
+    "url" VARCHAR(250) NOT NULL,
+    "title" VARCHAR(250) NOT NULL,
+    "category" VARCHAR(50) NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "location" VARCHAR(250) NOT NULL,
+    "status" BOOLEAN NOT NULL,
+    "type" VARCHAR(50),
+    "discounts" VARCHAR(4),
+    "variant" TEXT,
+    "stock" INTEGER,
+    "variantType" CHAR(10),
+    "listedPrice" DOUBLE PRECISION,
+    "sku" VARCHAR(50),
+    "thc" TEXT,
+    "cbd" TEXT,
+
+    CONSTRAINT "ListingAppSide_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_id_key" ON "users"("id");
 
@@ -81,6 +91,9 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_contact_no_key" ON "users"("contact_no");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ListingAppSide_source_id_key" ON "ListingAppSide"("source_id");
 
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_province_id_fkey" FOREIGN KEY ("province_id") REFERENCES "provinces"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
