@@ -81,3 +81,23 @@ model Session {
   
   @@map("sessions")
 }
+
+model ListingAppSide {
+  id          String  @id @db.Uuid
+  source_id   String  @unique
+  url         String  @db.VarChar(250)
+  title       String  @db.VarChar(250)
+  category    String  @db.VarChar(50)
+  price       Float
+  location    String  @db.VarChar(250)
+  status      Boolean
+  type        String? @db.VarChar(50)
+  discounts   String? @db.VarChar(4)
+  variant     String?
+  stock       Int?
+  variantType String? @db.Char(10)
+  listedPrice Float?
+  sku         String? @db.VarChar(50)
+  thc         String?
+  cbd         String?
+}
