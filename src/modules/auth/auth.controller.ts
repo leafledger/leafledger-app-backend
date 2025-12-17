@@ -83,36 +83,54 @@ export async function login(req: Request, res: Response) {
   }
 }
 
-export async function protect (req: Request, res: Response, next: NextFunction) {
-    // 1) Getting token and check if it is there or not
-    let token;
-    if(req.headers.authorization?.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1];
-    } 
+export async function protect(req: Request, res: Response, next: NextFunction) {
+  // 1) Getting token and check if it is there or not
+  let token;
+  if (req.headers.authorization?.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
 
-    // 2) check wheather token is there or not, if not then user is not logged in
-    if (!token) {
-        return unauthorizedResponse(res, "You are not logged in!! Please login to get the access!!");
+  // 2) check wheather token is there or not, if not then user is not logged in
+  if (!token) {
+    return unauthorizedResponse(
+      res,
+      "You are not logged in!! Please login to get the access!!"
+    );
+  }
+
+  try {
+    // 3) verification of the token using centralized utility
+    const decoded = await verifyToken(token, "access");
+
+    // // 4) check the user is there or not in the Database (optimized: select only needed fields)
+    const existingUser = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: {
+        id: true,
+        user_name: true,
+        email: true,
+        name: true,
+        contact_no: true,
+        store: true,
+        province_id: true,
+        city: true,
+        vendor_type: true,
+        address: true,
+        organisation_id: true,
+      },
+    });
+
+    if (!existingUser) {
+      return unauthorizedResponse(
+        res,
+        "The user belonging to this token no longer exists."
+      );
     }
 
-    try {
-        // 3) verification of the token using centralized utility
-        const decoded = await verifyToken(token, "access");
-       
-        // // 4) check the user is there or not in the Database
-        const existingUser = await prisma.user.findFirst({
-          where: { OR: [{ email: decoded.email }, { id: decoded.id }] },
-        });
-
-        if (!existingUser) {
-            return unauthorizedResponse(res, "The user belonging to this token no longer exists.");
-        }
-
-        // Grant access on the basis of logged in user
-        req["user"] = existingUser;
-        next();
-    } catch (error) {
-        return unauthorizedResponse(res, "Invalid token or token expired");
-    }
-};
-
+    // Grant access on the basis of logged in user
+    req["user"] = existingUser;
+    next();
+  } catch (error) {
+    return unauthorizedResponse(res, "Invalid token or token expired");
+  }
+}

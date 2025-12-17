@@ -72,13 +72,16 @@ model Plan {
 }
 
 model Session {
-  id     String   @id @default(uuid())
+  id             String   @id @default(uuid())
   auth_token     String
   refresh_token  String
-  user_id        String     @db.VarChar(36) // UUID length
+  user_id        String   @db.VarChar(36) // UUID length
   user           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   createdAt      DateTime @default(now())
   
+  @@index([auth_token])
+  @@index([refresh_token])
+  @@index([user_id])
   @@map("sessions")
 }
 
