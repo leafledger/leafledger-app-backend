@@ -1,4 +1,4 @@
-import validator from "validator";
+import validator from 'validator';
 
 // Function to sanitize user input
 export function sanitizeInput(input: string): string {

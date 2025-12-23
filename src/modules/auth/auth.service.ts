@@ -1,15 +1,14 @@
-import bcrypt from "bcrypt";
-import jwt, { Secret } from "jsonwebtoken";
-import prisma from "../../config/db";
-import { config } from "../../config/config";
-import { validatePasswordComplexity } from "../../utils/password.util";
-import { sanitizeUserInput } from "../../utils/inputSanitizer";
-import { generateTokens } from "../../utils/jwt.util";
+import bcrypt from 'bcrypt';
+import prisma from '../../config/db';
+import { config } from '../../config/config';
+import { validatePasswordComplexity } from '../../utils/password.util';
+import { sanitizeUserInput } from '../../utils/inputSanitizer';
+import { generateTokens } from '../../utils/jwt.util';
 
 export async function signupService(data: any) {
   // Sanitize input data first
   const sanitizedData = sanitizeUserInput(data);
-  
+
   const {
     user_name,
     email,
@@ -30,19 +29,23 @@ export async function signupService(data: any) {
   if (existingUser) {
     // checking which fields match with the database
     const conflictFields = [];
-    if (existingUser.email === email) conflictFields.push("email");
-    if (existingUser.user_name === user_name) conflictFields.push("user_name");
-    if (existingUser.contact_no === contact_no) conflictFields.push("contact_no");
+    if (existingUser.email === email) conflictFields.push('email');
+    if (existingUser.user_name === user_name) conflictFields.push('user_name');
+    if (existingUser.contact_no === contact_no)
+      conflictFields.push('contact_no');
 
     throw new Error(
-      `User already exists with this ${conflictFields.join(", ")}`
+      `User already exists with this ${conflictFields.join(', ')}`,
     );
   }
 
   // Step: 1.5 - Validate password complexity
   const passwordValidation = validatePasswordComplexity(password);
   if (!passwordValidation.isValid) {
-    throw new Error(passwordValidation.message || "Password does not meet complexity requirements");
+    throw new Error(
+      passwordValidation.message ||
+        'Password does not meet complexity requirements',
+    );
   }
 
   // Step: 2 - Hashing password
@@ -74,13 +77,13 @@ export async function loginService(email: string, password: string) {
   });
 
   if (!user) {
-    throw new Error("Invalid credentials");
+    throw new Error('Invalid credentials');
   }
 
   // Verify password
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    throw new Error("Invalid credentials");
+    throw new Error('Invalid credentials');
   }
 
   // Step: 4 - Generate JWT token
@@ -96,6 +99,6 @@ export async function loginService(email: string, password: string) {
       contact_no: user.contact_no,
       name: user.name,
     },
-    message: "Login successful",
+    message: 'Login successful',
   };
 }

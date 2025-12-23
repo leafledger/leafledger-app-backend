@@ -1,9 +1,12 @@
-import { Request, Response } from "express";
-import { validate } from "class-validator";
-import { LogoutDto } from "./logout.dto";
-import { logoutService } from "./logout.service";
-import { validationErrorHandler } from "../../middleware/errorHandler";
-import { successResponse, errorResponse } from "../../middleware/responseHandler";
+import { Request, Response } from 'express';
+import { validate } from 'class-validator';
+import { LogoutDto } from './logout.dto';
+import { logoutService } from './logout.service';
+import { validationErrorHandler } from '../../middleware/errorHandler';
+import {
+  successResponse,
+  errorResponse,
+} from '../../middleware/responseHandler';
 
 export async function logout(req: Request, res: Response) {
   try {
@@ -23,6 +26,6 @@ export async function logout(req: Request, res: Response) {
 
     return successResponse(res, {}, result.message);
   } catch (error: any) {
-    return errorResponse(res, error.message || "Logout failed");
+    return errorResponse(res, error.message || 'Logout failed');
   }
 }

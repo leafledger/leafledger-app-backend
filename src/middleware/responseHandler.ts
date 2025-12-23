@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Response } from 'express';
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -11,8 +11,8 @@ export interface ApiResponse<T = any> {
 export function successResponse<T = any>(
   res: Response,
   data?: T,
-  message: string = "Request successful",
-  statusCode: number = 200
+  message: string = 'Request successful',
+  statusCode: number = 200,
 ) {
   return res.status(statusCode).json({
     success: true,
@@ -23,9 +23,9 @@ export function successResponse<T = any>(
 
 export function errorResponse(
   res: Response,
-  message: string = "Request failed",
+  message: string = 'Request failed',
   errors?: { field: string; message: string }[],
-  statusCode: number = 400
+  statusCode: number = 400,
 ) {
   return res.status(statusCode).json({
     success: false,
@@ -36,7 +36,7 @@ export function errorResponse(
 
 export function serverErrorResponse(
   res: Response,
-  message: string = "Internal server error"
+  message: string = 'Internal server error',
 ) {
   return res.status(500).json({
     success: false,
@@ -48,7 +48,7 @@ export function serverErrorResponse(
 export function createdResponse<T = any>(
   res: Response,
   data?: T,
-  message: string = "Resource created successfully"
+  message: string = 'Resource created successfully',
 ) {
   return res.status(201).json({
     success: true,
@@ -59,7 +59,7 @@ export function createdResponse<T = any>(
 
 export function notFoundResponse(
   res: Response,
-  message: string = "Resource not found"
+  message: string = 'Resource not found',
 ) {
   return res.status(404).json({
     success: false,
@@ -69,7 +69,7 @@ export function notFoundResponse(
 
 export function unauthorizedResponse(
   res: Response,
-  message: string = "Unauthorized"
+  message: string = 'Unauthorized',
 ) {
   return res.status(401).json({
     success: false,
@@ -79,7 +79,7 @@ export function unauthorizedResponse(
 
 export function forbiddenResponse(
   res: Response,
-  message: string = "Forbidden"
+  message: string = 'Forbidden',
 ) {
   return res.status(403).json({
     success: false,

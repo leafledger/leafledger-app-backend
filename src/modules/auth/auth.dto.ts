@@ -6,22 +6,23 @@ import {
   IsString,
   IsIn,
   Matches,
-} from "class-validator";
+} from 'class-validator';
 
 export class SignupDto {
-  @Length(3, 50, { message: "user_name must be 3-50 characters" })
+  @Length(3, 50, { message: 'user_name must be 3-50 characters' })
   @Matches(/^[A-Za-z0-9._]+$/, {
-    message: "user_name can only contain letters, numbers, dot, and underscore (no spaces or special characters)",
+    message:
+      'user_name can only contain letters, numbers, dot, and underscore (no spaces or special characters)',
   })
   user_name: string;
 
-  @IsEmail({}, { message: "Invalid email" })
+  @IsEmail({}, { message: 'Invalid email' })
   email: string;
 
-  @Length(6, 128, { message: "Password must be at least 6 characters" })
+  @Length(6, 128, { message: 'Password must be at least 6 characters' })
   password: string;
 
-  @IsPhoneNumber("IN", { message: "Invalid phone number" })
+  @IsPhoneNumber('IN', { message: 'Invalid phone number' })
   contact_no: string;
 
   @IsOptional()
@@ -42,8 +43,8 @@ export class SignupDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(["vendor", "customer", "admin"], {
-    message: "vendor_type must be vendor, customer, or admin",
+  @IsIn(['vendor', 'customer', 'admin'], {
+    message: 'vendor_type must be vendor, customer, or admin',
   })
   vendor_type?: string;
 
@@ -53,9 +54,12 @@ export class SignupDto {
 }
 
 export class LoginDto {
-  @IsEmail({}, { message: "Invalid email format. Please check your entered mail!!" })
+  @IsEmail(
+    {},
+    { message: 'Invalid email format. Please check your entered mail!!' },
+  )
   email: string;
 
-  @Length(6, 128, { message: "Password must be at least 6 characters" })
+  @Length(6, 128, { message: 'Password must be at least 6 characters' })
   password: string;
 }

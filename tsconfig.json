@@ -12,7 +12,7 @@
     "skipLibCheck": true,
     "strict": true,
     "strictPropertyInitialization": false,
-    "typeRoots": ["src/@types", "./node_modules/@types"]
+    "typeRoots": ["src/types", "./node_modules/@types"]
   },
   "include": [
     "server.ts",
