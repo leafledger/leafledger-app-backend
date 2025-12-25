@@ -1,16 +1,16 @@
-import authRoutes from "./src/modules/auth/auth.routes";
-import { errorHandler } from "./src/middleware/errorHandler";
-import refreshRouter from "./src/modules/refresh/refresh.router";
-import catalogRouter from "./src/modules/catalog/catalog.routes";
+import authRoutes from './src/modules/auth/auth.routes';
+import { errorHandler } from './src/middleware/errorHandler';
+import refreshRouter from './src/modules/refresh/refresh.router';
+import catalogRouter from './src/modules/catalog/catalog.routes';
 
-import cors from "cors";
-import express from "express";
-import { config } from "./src/config/config";
-import dotenv from "dotenv";
-import logoutRouter from "./src/modules/logout/logout.routes";
+import cors from 'cors';
+import express from 'express';
+import { config } from './src/config/config';
+import dotenv from 'dotenv';
+import logoutRouter from './src/modules/logout/logout.routes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './src/config/swagger.config';
-import { connectDatabase } from "./src/config/db";
+import { connectDatabase } from './src/config/db';
 
 // Load environment variables
 dotenv.config();
@@ -24,16 +24,15 @@ app.use(express.json());
 app.use(
   cors({
     origin:
-      process.env.NODE_ENV === "production"
+      process.env.NODE_ENV === 'production'
         ? process.env.FRONTEND_URL
-        : "http://localhost:5173",
+        : 'http://localhost:5173',
     credentials: true, // We will allow cookies if needed
-  })
+  }),
 );
 
-
 // API calling request
-app.use("/api/auth", authRoutes);
+app.use('/api/auth', authRoutes);
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -45,13 +44,12 @@ app.get('/api-docs.json', (req, res) => {
 // Global error handler - should be the last middleware
 app.use(errorHandler);
 
+app.use('/refresh', refreshRouter);
 
-app.use("/refresh", refreshRouter);
-
-app.use("/logout", logoutRouter);
+app.use('/logout', logoutRouter);
 
 // CATALOG
-app.use("/api/catalog", catalogRouter);
+app.use('/api/catalog', catalogRouter);
 
 const port = config.server.port;
 
@@ -64,7 +62,9 @@ async function startServer() {
     // Then start the server
     app.listen(port, () => {
       console.log(`[SERVER] Running on port ${port}`);
-      console.log(`[SERVER] API Documentation available at http://localhost:${port}/api-docs`);
+      console.log(
+        `[SERVER] API Documentation available at http://localhost:${port}/api-docs`,
+      );
     });
   } catch (error) {
     console.error('[SERVER] Failed to start:', error);

@@ -1,18 +1,19 @@
 // Password utility functions
-export function validatePasswordComplexity(
-  password: string
-): { isValid: boolean; message?: string } {
+export function validatePasswordComplexity(password: string): {
+  isValid: boolean;
+  message?: string;
+} {
   if (password.length < 6) {
     return {
       isValid: false,
-      message: "Password must be at least 6 characters long",
+      message: 'Password must be at least 6 characters long',
     };
   }
 
   if (password.length > 128) {
     return {
       isValid: false,
-      message: "Password must be less than 128 characters",
+      message: 'Password must be less than 128 characters',
     };
   }
 

@@ -1,5 +1,5 @@
-import { verifyToken } from "../../utils/jwt.util";
-import { addToBlacklist } from "./logout.blacklist.helper";
+import { verifyToken } from '../../utils/jwt.util';
+import { addToBlacklist } from './logout.blacklist.helper';
 
 /**
  * Service to handle logout logic
@@ -8,18 +8,18 @@ import { addToBlacklist } from "./logout.blacklist.helper";
 export async function logoutService(refreshToken: string) {
   try {
     // Verify the refresh token
-    await verifyToken(refreshToken, "refresh");
+    await verifyToken(refreshToken, 'refresh');
 
     // Add to blacklist to prevent future use
     addToBlacklist(refreshToken);
 
     return {
-      message: "Logged out successfully",
+      message: 'Logged out successfully',
     };
   } catch (error: any) {
     // Even if token is invalid/expired, allow logout to proceed to ensure users can always logout
     return {
-      message: "Logged out successfully (token was invalid)",
+      message: 'Logged out successfully (token was invalid)',
     };
   }
 }

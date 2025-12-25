@@ -1,19 +1,18 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from 'express';
 
-import { SignupDto, LoginDto } from "./auth.dto";
-import { validate } from "class-validator";
-import { signupService, loginService } from "./auth.service";
-import { validationErrorHandler } from "../../middleware/errorHandler";
+import { SignupDto, LoginDto } from './auth.dto';
+import { validate } from 'class-validator';
+import { signupService, loginService } from './auth.service';
+import { validationErrorHandler } from '../../middleware/errorHandler';
 import {
   createdResponse,
   successResponse,
   errorResponse,
   unauthorizedResponse,
-} from "../../middleware/responseHandler";
+} from '../../middleware/responseHandler';
 
-import prisma from "../../config/db";
-import { config } from "../../config/config";
-import { verifyToken } from "../../utils/jwt.util";
+import prisma from '../../config/db';
+import { verifyToken } from '../../utils/jwt.util';
 
 export async function signup(req: Request, res: Response) {
   try {
@@ -45,10 +44,10 @@ export async function signup(req: Request, res: Response) {
           contact_no: result.user.contact_no,
         },
       },
-      "Signup successful"
+      'Signup successful',
     );
   } catch (error: any) {
-    return errorResponse(res, error.message || "Server error");
+    return errorResponse(res, error.message || 'Server error');
   }
 }
 
@@ -76,31 +75,31 @@ export async function login(req: Request, res: Response) {
         refreshToken: result.refreshToken,
         user: result.user,
       },
-      result.message
+      result.message,
     );
   } catch (error: any) {
-    return errorResponse(res, error.message || "Login failed");
+    return errorResponse(res, error.message || 'Login failed');
   }
 }
 
 export async function protect(req: Request, res: Response, next: NextFunction) {
   // 1) Getting token and check if it is there or not
   let token;
-  if (req.headers.authorization?.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
+  if (req.headers.authorization?.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
   }
 
   // 2) check wheather token is there or not, if not then user is not logged in
   if (!token) {
     return unauthorizedResponse(
       res,
-      "You are not logged in!! Please login to get the access!!"
+      'You are not logged in!! Please login to get the access!!',
     );
   }
 
   try {
     // 3) verification of the token using centralized utility
-    const decoded = await verifyToken(token, "access");
+    const decoded = await verifyToken(token, 'access');
 
     // // 4) check the user is there or not in the Database (optimized: select only needed fields)
     const existingUser = await prisma.user.findUnique({
@@ -123,14 +122,14 @@ export async function protect(req: Request, res: Response, next: NextFunction) {
     if (!existingUser) {
       return unauthorizedResponse(
         res,
-        "The user belonging to this token no longer exists."
+        'The user belonging to this token no longer exists.',
       );
     }
 
     // Grant access on the basis of logged in user
-    req["user"] = existingUser;
+    req['user'] = existingUser;
     next();
   } catch (error) {
-    return unauthorizedResponse(res, "Invalid token or token expired");
+    return unauthorizedResponse(res, 'Invalid token or token expired');
   }
 }

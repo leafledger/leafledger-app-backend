@@ -1,15 +1,17 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
 // Singleton Prisma client instance
 declare global {
   var prisma: PrismaClient | undefined;
 }
 
-const prisma = global.prisma || new PrismaClient({
-  log: ['error'],
-});
+const prisma =
+  global.prisma ||
+  new PrismaClient({
+    log: ['error'],
+  });
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== 'production') {
   global.prisma = prisma;
 }
 
@@ -23,10 +25,16 @@ export async function connectDatabase() {
     const isSupabase = dbUrl.includes('supabase.com');
     const isLocal = dbUrl.includes('localhost');
 
-    const dbType = isSupabase ? 'Supabase (Production)' : isLocal ? 'Local PostgreSQL' : 'Database';
+    const dbType = isSupabase
+      ? 'Supabase (Production)'
+      : isLocal
+        ? 'Local PostgreSQL'
+        : 'Database';
 
     console.log(`[DATABASE] Connected successfully to ${dbType}`);
-    console.log(`[DATABASE] Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(
+      `[DATABASE] Environment: ${process.env.NODE_ENV || 'development'}`,
+    );
 
     // Test a simple query
     await prisma.$queryRaw`SELECT 1`;

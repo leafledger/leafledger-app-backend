@@ -1,28 +1,28 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 
 // Global error handling middleware
 export function errorHandler(
   err: any,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
-  console.error("Error occurred:", err);
+  console.error('Error occurred:', err);
 
   // Determine status code based on error type
   const statusCode = err.statusCode || 500;
 
   // Don't expose sensitive error details in production
   const message =
-    process.env.NODE_ENV === "production"
+    process.env.NODE_ENV === 'production'
       ? statusCode === 500
-        ? "Internal Server Error"
+        ? 'Internal Server Error'
         : err.message
       : err.message;
 
   res.status(statusCode).json({
     message,
-    ...(process.env.NODE_ENV !== "production" && { stack: err.stack }),
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
   });
 }
 
@@ -35,7 +35,7 @@ export function validationErrorHandler(errors: any[], res: Response) {
     }));
 
     return res.status(400).json({
-      message: "Validation failed",
+      message: 'Validation failed',
       errors: formattedErrors,
     });
   }

@@ -1,22 +1,23 @@
-import jwt from "jsonwebtoken";
-import { config } from "../../config/config";
-import { verifyToken } from "../../utils/jwt.util";
+import jwt from 'jsonwebtoken';
+import { config } from '../../config/config';
+import { verifyToken } from '../../utils/jwt.util';
 
 export async function refreshTokenService(refreshToken: string) {
   try {
     // Verify the refresh token using centralized utility
-    const decoded = await verifyToken(refreshToken, "refresh");
+    const decoded = await verifyToken(refreshToken, 'refresh');
 
     // Generate new access token
+    // eslint-disable-next-line no-undef
     const ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET! || config.jwt.secret;
     const newAccessToken = jwt.sign(
       { id: decoded.id, email: decoded.email },
       ACCESS_SECRET,
-      { expiresIn: config.jwt.accessExpiresIn } as jwt.SignOptions
+      { expiresIn: config.jwt.accessExpiresIn } as jwt.SignOptions,
     );
 
     return { accessToken: newAccessToken };
   } catch {
-    throw new Error("Invalid or expired refresh token");
+    throw new Error('Invalid or expired refresh token');
   }
 }
