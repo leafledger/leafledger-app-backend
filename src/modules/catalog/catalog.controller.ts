@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { catalogDataHandling, fetchDetailsOnIdBasis } from './catalog.service';
+import { catalogDataHandling, fetchDetailsOnIdBasis, fetchS3Images } from './catalog.service';
 import {
   successResponse,
   errorResponse,
@@ -70,5 +70,15 @@ export async function getCatalogDetails(req: Request, res: Response) {
       error.message ||
         'Something went wrong while fetching data. Please try again later',
     );
+  }
+}
+
+// S3 Images for catalog list/details
+export async function getS3Images(req: Request, res: Response) {
+  try {
+    const images = await fetchS3Images();
+    successResponse(res, images, 'Successfully Fetch s3 Images');
+  } catch (error: any) {
+    errorResponse(res, error.message);
   }
 }

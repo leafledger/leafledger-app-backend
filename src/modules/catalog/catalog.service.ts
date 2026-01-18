@@ -2,6 +2,7 @@ import prisma from '../../config/db';
 import { validate as isUUID } from 'uuid';
 import { parseKeyValueString } from '../../utils/parse';
 import { CatalogQueryStringProp } from './catalog.types';
+import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 
 // Constants
 const allowedSortKeys = ['title', 'price', 'category', 'location', 'createdAt'];
@@ -80,4 +81,30 @@ export async function fetchDetailsOnIdBasis(id: string) {
   }
 
   return detailsData;
+}
+
+// Fetch Images
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION as string,
+});
+
+export async function fetchS3Images() {
+  try {
+    const bucket = process.env.S3_BUCKET_NAME as string;
+    const region = process.env.AWS_REGION as string;
+
+    const command = new ListObjectsV2Command({ Bucket: bucket })
+    const response = await s3Client.send(command);
+
+    return response.Contents
+        ?.filter((item): item is { Key: string } => !!item.Key)
+        .map(
+          (item) =>
+            `https://${bucket}.s3.${region}.amazonaws.com/${item.Key}`
+        ) || []
+  
+  } catch (error) {
+    console.error("S3 error:", error); // Will see AWS error in logs
+    throw new Error("Failed to fetch images from S3. Please try again later!");
+  }
 }
