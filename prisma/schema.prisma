@@ -103,4 +103,19 @@ model ListingAppSide {
   sku         String? @db.VarChar(50)
   thc         String?
   cbd         String?
+  brand       String?
+  
+  // images
+  cover_image   String?
+  image2        String?
+  image3        String?
+  image4        String?
+  all_img       String[]
+
+  // cached_images
+  cached_cover_image String?
+  cached_image2      String?
+  cached_image3      String?
+  cached_image4      String?
+  cached_all_img     String[]
 }
