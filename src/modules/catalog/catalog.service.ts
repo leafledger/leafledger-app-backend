@@ -2,6 +2,7 @@ import prisma from '../../config/db';
 import { validate as isUUID } from 'uuid';
 import { parseKeyValueString } from '../../utils/parse';
 import { CatalogQueryStringProp } from './catalog.types';
+import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 
 // Constants
 const allowedSortKeys = ['title', 'price', 'category', 'location', 'createdAt'];
